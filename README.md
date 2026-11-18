@@ -8,4 +8,4 @@ Run `python build.py` in this folder to create the .love, web ZIP, portable Wind
 
 Use `python build.py --serve` to test the browser build at http://localhost:8000. To host it, extract the web ZIP to a static HTTPS host. For Windows, extract the entire ZIP and launch upo.exe. For Linux, extract the tarball and run `./upo/upo`.
 
-In Options, cycle through window sizes from smallest to largest, then Fullscreen. Back applies the choice. Window sizes leave room for the frame and taskbar on the current monitor. Fullscreen uses the desktop resolution. The browser fits the game automatically.
+On desktop, open Options and cycle through window sizes from smallest to largest, then Fullscreen. Back applies the choice. Window sizes leave room for the frame and taskbar on the current monitor. Fullscreen uses the desktop resolution. The browser fits the game automatically.

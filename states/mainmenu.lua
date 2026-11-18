@@ -31,15 +31,24 @@ function mainmenu:load()
 
   playButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5, 900, 100, function() menustate = "levels" end)
   optionsButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100, 900, 100, function() display.refresh(display.width()); menustate = "options" end)
-  quitButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 200, 900, 100, function() menustate = "quit" end)
+  if not webBuild then
+    quitButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 200, 900, 100, function() menustate = "quit" end)
 
-  quitYesButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5, 900, 100, function() love.event.quit() end)
-  quitNoButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100, 900, 100, function() menustate = "main" end)
+    quitYesButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5, 900, 100, function() love.event.quit() end)
+    quitNoButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100, 900, 100, function() menustate = "main" end)
+  end
 
   optionsJoystickButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 - 100, 900, 100, function() isJoystickMove = not isJoystickMove joystickNoticeTextOpacity = 1 end)
-  optionsResolutionButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5, 900, 100, function() mainmenu:changeResolution(1) end, function() mainmenu:changeResolution(-1) end)
+  if not webBuild then
+    optionsResolutionButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5, 900, 100, function() mainmenu:changeResolution(1) end, function() mainmenu:changeResolution(-1) end)
+  end
   optionsVolumeButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100, 900, 100, function() mainmenu:changeVolume(5) end, function() mainmenu:changeVolume(-5) end)
   optionsBackButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 200, 900, 100, function() menustate = "main" mainmenu:saveSettings() end)
+
+  if webBuild then
+    optionsVolumeButton.y = gh * 0.5
+    optionsBackButton.y = optionsVolumeButton.y + optionsVolumeButton.height
+  end
 
   level1Button = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.1 - 20, 900, 140, function() mainmenu:startLevel(1) end)
   level2Button = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.1 + 120, 900, 120, function() mainmenu:startLevel(2) end)
@@ -76,12 +85,12 @@ function mainmenu:update(dt)
   if (menustate == "main") then
     playButton:update(dt)
     optionsButton:update(dt)
-    quitButton:update(dt)
+    if quitButton then quitButton:update(dt) end
   elseif (menustate == "options") then
     if (joystick ~= nil) then
       optionsJoystickButton:update(dt)
     end
-    optionsResolutionButton:update(dt)
+    if optionsResolutionButton then optionsResolutionButton:update(dt) end
     optionsVolumeButton:update(dt)
     optionsBackButton:update(dt)
   elseif (menustate == "quit") then
@@ -124,12 +133,12 @@ function mainmenu:mousepressed(x, y, button)
   if (menustate == "main") then
     playButton:mousepressed(x, y, button)
     optionsButton:mousepressed(x, y, button)
-    quitButton:mousepressed(x, y, button)
+    if quitButton then quitButton:mousepressed(x, y, button) end
   elseif (menustate == "options") then
     if (joystick ~= nil) then
       optionsJoystickButton:mousepressed(x, y, button)
     end
-    optionsResolutionButton:mousepressed(x, y, button)
+    if optionsResolutionButton then optionsResolutionButton:mousepressed(x, y, button) end
     optionsVolumeButton:mousepressed(x, y, button)
     optionsBackButton:mousepressed(x, y, button)
   elseif (menustate == "quit") then
@@ -148,7 +157,7 @@ end
 
 function mainmenu:gamepadpressed(joystick, button)
   if (button == "start" or button == "back" or button == "b") then
-    if (menustate == "main") then
+    if menustate == "main" and quitButton then
       menustate = "quit"
     elseif (menustate == "options") then
       self:saveSettings()
@@ -160,12 +169,12 @@ function mainmenu:gamepadpressed(joystick, button)
   if (menustate == "main") then
     playButton:gamepadpressed(joystick, button)
     optionsButton:gamepadpressed(joystick, button)
-    quitButton:gamepadpressed(joystick, button)
+    if quitButton then quitButton:gamepadpressed(joystick, button) end
   elseif (menustate == "options") then
     if (joystick ~= nil) then
       optionsJoystickButton:gamepadpressed(joystick, button)
     end
-    optionsResolutionButton:gamepadpressed(joystick, button)
+    if optionsResolutionButton then optionsResolutionButton:gamepadpressed(joystick, button) end
     optionsVolumeButton:gamepadpressed(joystick, button)
     optionsBackButton:gamepadpressed(joystick, button)
   elseif (menustate == "quit") then
@@ -184,7 +193,7 @@ end
 
 function mainmenu:keypressed(key)
   if (key == "escape") then
-    if (menustate == "main") then
+    if menustate == "main" and quitButton then
       menustate = "quit"
     elseif (menustate == "options") then
       self:saveSettings()
@@ -225,6 +234,7 @@ function mainmenu:mainButtons()
   love.graphics.setColor(White)
   love.graphics.printf("Options", 0, gh*0.52 + 100, gw, "center")
 
+  if not quitButton then return end
   if (quitButton:getHoverState()) then
     love.graphics.setColor(Opacity17)
   else
@@ -264,41 +274,43 @@ function mainmenu:optionsButtons()
   end
 
 
-  if (optionsResolutionButton:getHoverState()) then
-    love.graphics.setColor(Opacity17)
-  else
-    love.graphics.setColor(Transparent)
+  if optionsResolutionButton then
+    if (optionsResolutionButton:getHoverState()) then
+      love.graphics.setColor(Opacity17)
+    else
+      love.graphics.setColor(Transparent)
+    end
+    love.graphics.polygon('fill', gw/2 - 450-menumusic:getEnergy()*10, gh*0.5,
+                                  gw/2 + 450+menumusic:getEnergy()*10, gh*0.5,
+                                  gw/2 + 450+menumusic:getEnergy()*10, gh*0.5 + 100,
+                                  gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100)
+    love.graphics.setColor(White)
+    love.graphics.printf("Resolution: " .. display.label(), 0, gh*0.52, gw, "center")
   end
-  love.graphics.polygon('fill', gw/2 - 450-menumusic:getEnergy()*10, gh*0.5,
-                                gw/2 + 450+menumusic:getEnergy()*10, gh*0.5,
-                                gw/2 + 450+menumusic:getEnergy()*10, gh*0.5 + 100,
-                                gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100)
-  love.graphics.setColor(White)
-  love.graphics.printf("Resolution: " .. display.label(), 0, gh*0.52, gw, "center")
 
   if (optionsVolumeButton:getHoverState()) then
     love.graphics.setColor(Opacity17)
   else
     love.graphics.setColor(Transparent)
   end
-  love.graphics.polygon('fill', gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100,
-                                gw/2 + 450+menumusic:getEnergy()*10, gh*0.5 + 100,
-                                gw/2 + 450+menumusic:getEnergy()*10, gh*0.5 + 200,
-                                gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 200)
+  love.graphics.polygon('fill', gw/2 - 450-menumusic:getEnergy()*10, optionsVolumeButton.y,
+                                gw/2 + 450+menumusic:getEnergy()*10, optionsVolumeButton.y,
+                                gw/2 + 450+menumusic:getEnergy()*10, optionsVolumeButton.y + optionsVolumeButton.height,
+                                gw/2 - 450-menumusic:getEnergy()*10, optionsVolumeButton.y + optionsVolumeButton.height)
   love.graphics.setColor(White)
-  love.graphics.printf("Volume: " .. volumeValue .."%", 0, gh*0.52 + 100, gw, "center")
+  love.graphics.printf("Volume: " .. volumeValue .."%", 0, optionsVolumeButton.y + gh*0.02, gw, "center")
 
   if (optionsBackButton:getHoverState()) then
     love.graphics.setColor(Opacity17)
   else
     love.graphics.setColor(Transparent)
   end
-  love.graphics.polygon('fill', gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 200,
-                                gw/2 + 450+menumusic:getEnergy()*10, gh*0.5 + 200,
-                                gw/2 + 450+menumusic:getEnergy()*10, gh*0.5 + 300,
-                                gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 300)
+  love.graphics.polygon('fill', gw/2 - 450-menumusic:getEnergy()*10, optionsBackButton.y,
+                                gw/2 + 450+menumusic:getEnergy()*10, optionsBackButton.y,
+                                gw/2 + 450+menumusic:getEnergy()*10, optionsBackButton.y + optionsBackButton.height,
+                                gw/2 - 450-menumusic:getEnergy()*10, optionsBackButton.y + optionsBackButton.height)
   love.graphics.setColor(White)
-  love.graphics.printf("Back", 0, gh*0.52 + 200, gw, "center")
+  love.graphics.printf("Back", 0, optionsBackButton.y + gh*0.02, gw, "center")
 end
 
 function mainmenu:quitButtons()

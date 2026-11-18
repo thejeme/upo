@@ -173,7 +173,7 @@ function maingame:endScreen()
   else
     love.graphics.setColor(0.7, 0.7, 0.7, 1)
   end
-  love.graphics.printf("Exit", 0, gh*0.56, gw, "center")
+  love.graphics.printf(webBuild and "Levels" or "Exit", 0, gh*0.56, gw, "center")
 
   love.graphics.setFont(levelScoreFont)
   love.graphics.setColor(White)
