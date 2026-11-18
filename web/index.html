@@ -27,7 +27,10 @@ async function prepare() {
   statusButton.onclick = async () => {
     statusButton.hidden = true;
     canvas.focus();
-    const module = {canvas, arguments:["./game.love","--web"], INITIAL_MEMORY:134217728,
+    // Use the longer edge so rotating a phone keeps the original artwork sharp.
+    const pixels = Math.max(innerWidth, innerHeight) * (window.devicePixelRatio || 1);
+    const units = Math.min(120, Math.max(40, Math.ceil(pixels / 16)));
+    const module = {canvas, arguments:["./game.love","--web","--canvas-units=" + units], INITIAL_MEMORY:134217728,
       preRun:[() => module.FS_createDataFile("/", "game.love", bytes, true, false, true)],
       printErr:console.error.bind(console), onAbort:failed};
     try { await Love(module); } catch (err) { failed(err); }

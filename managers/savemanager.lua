@@ -5,7 +5,7 @@ savemanager = {}
 function savemanager:load()
   if not love.filesystem.getInfo("settings.txt") then
     settings = {}
-    settings.resolutionIndex = 8
+    settings.windowWidth = 0
     settings.volume = 100
 
     love.filesystem.write("settings.txt", serialize(settings))
@@ -28,9 +28,9 @@ function savemanager:saveHighscores()
   love.filesystem.write("highscores.txt", serialize(savemanager.highscores))
 end
 
-function savemanager:saveSettings(resolutionIndex, volume)
+function savemanager:saveSettings(windowWidth, volume)
   settings = {}
-  settings.resolutionIndex = resolutionIndex
+  settings.windowWidth = windowWidth
   settings.volume = volume
 
   love.filesystem.write("settings.txt", serialize(settings))

@@ -1,3 +1,4 @@
+local display = require 'lib/display'
 require 'objects/cursor'
 require 'objects/button'
 
@@ -29,7 +30,7 @@ function mainmenu:load()
   end)
 
   playButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5, 900, 100, function() menustate = "levels" end)
-  optionsButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100, 900, 100, function() menustate = "options" end)
+  optionsButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100, 900, 100, function() display.refresh(display.width()); menustate = "options" end)
   quitButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 200, 900, 100, function() menustate = "quit" end)
 
   quitYesButton = newButton(gw/2 - 450-menumusic:getEnergy()*10, gh*0.5, 900, 100, function() love.event.quit() end)
@@ -59,16 +60,11 @@ function mainmenu:startLevel(levelIndex)
 end
 
 function mainmenu:saveSettings()
-  savemanager:saveSettings(resolutionIndex, volumeValue)
-  if (changedResolution) then
+  if changedResolution then
+    display.apply()
     changedResolution = false
-    if resolutionList[resolutionIndex][1] == 0 and resolutionList[resolutionIndex][2] == 0 then
-      isFullScreen = true
-    else
-      isFullScreen = false
-    end
-    simpleScale.updateWindow(resolutionList[resolutionIndex][1], resolutionList[resolutionIndex][2], {fullscreen=isFullScreen})
   end
+  savemanager:saveSettings(display.width(), volumeValue)
 end
 
 function mainmenu:update(dt)
@@ -155,6 +151,7 @@ function mainmenu:gamepadpressed(joystick, button)
     if (menustate == "main") then
       menustate = "quit"
     elseif (menustate == "options") then
+      self:saveSettings()
       menustate = "main"
     elseif (menustate == "levels") then
       menustate = "main"
@@ -190,6 +187,7 @@ function mainmenu:keypressed(key)
     if (menustate == "main") then
       menustate = "quit"
     elseif (menustate == "options") then
+      self:saveSettings()
       menustate = "main"
     elseif (menustate == "levels") then
       menustate = "main"
@@ -276,11 +274,7 @@ function mainmenu:optionsButtons()
                                 gw/2 + 450+menumusic:getEnergy()*10, gh*0.5 + 100,
                                 gw/2 - 450-menumusic:getEnergy()*10, gh*0.5 + 100)
   love.graphics.setColor(White)
-  if resolutionList[resolutionIndex][1] == 0 and resolutionList[resolutionIndex][2] == 0 then
-    love.graphics.printf("Resolution: Fullscreen", 0, gh*0.52, gw, "center")
-  else
-    love.graphics.printf("Resolution: " .. resolutionList[resolutionIndex][1] .. "x" .. resolutionList[resolutionIndex][2], 0, gh*0.52, gw, "center")
-  end
+  love.graphics.printf("Resolution: " .. display.label(), 0, gh*0.52, gw, "center")
 
   if (optionsVolumeButton:getHoverState()) then
     love.graphics.setColor(Opacity17)
@@ -468,13 +462,9 @@ function mainmenu:levels()
 end
 
 function mainmenu:changeResolution(value)
+  if webBuild then return end
+  display.cycle(value)
   changedResolution = true
-  resolutionIndex = resolutionIndex + value
-  if (resolutionIndex < 1) then
-    resolutionIndex = #resolutionList
-  elseif (resolutionIndex > #resolutionList) then
-    resolutionIndex = 1
-  end
 end
 
 function mainmenu:changeVolume(value)

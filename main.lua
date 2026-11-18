@@ -1,4 +1,5 @@
 require 'lib/simpleScale'
+local display = require 'lib/display'
 
 require 'globals'
 require 'colors'
@@ -22,16 +23,9 @@ local appId = require 'applicationId'
 function love.load()
   savemanager:load()
   volumeValue = savemanager.settings.volume or 100
-  resolutionIndex = savemanager.settings.resolutionIndex or 8
+  display.load(savemanager.settings)
   statemanager:load()
   math.randomseed(os.time())
-  if resolutionList[resolutionIndex][1] == 0 and resolutionList[resolutionIndex][2] == 0 then
-    isFullScreen = true
-  else
-    isFullScreen = false
-  end
-  simpleScale.setWindow(gw, gh, resolutionList[resolutionIndex][1], resolutionList[resolutionIndex][2], {fullscreen = isFullScreen})
-  if not webBuild then love.window.setVSync(1) end
   cursor:load()
   love.graphics.setBackgroundColor(0.1, 0.1, 0.1, 1)
   love.mouse.setVisible(false)
