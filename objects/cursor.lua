@@ -8,6 +8,7 @@ local cursorPosX, cursorPosY
 function cursor:load()
   cursorMX = gw/2
   cursorMY = gh/2
+  cursorPosX, cursorPosY = cursorMX, cursorMY
 end
 
 function cursor:update(dt, isEndGame, levelIndex)  
@@ -75,6 +76,7 @@ function cursor:update(dt, isEndGame, levelIndex)
       end
 
     elseif (levelIndex == 3) then
+      if dist == 0 then dx, dy, dist = 1, 0, 1 end
       cursorPosX = gw/2 + dx/dist*(450-19)
       cursorPosY = gh/2 + dy/dist*(450-19)
     else

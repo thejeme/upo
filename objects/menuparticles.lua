@@ -23,9 +23,10 @@ function menuparticles:update(dt)
      cooldown = cooldown + dt
    end
      
-  for i, v in ipairs(listOfMenuParticles) do
-  v.y = v.y - dt * v.speed
-    if (v.radius > 2000) then
+  for i = #listOfMenuParticles, 1, -1 do
+    local v = listOfMenuParticles[i]
+    v.y = v.y - dt * v.speed
+    if (v.y + v.radius < 0) then
       table.remove(listOfMenuParticles, i)
     end
   end

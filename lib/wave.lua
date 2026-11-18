@@ -302,7 +302,7 @@ end
 function waveObject:calculateEnergy(offset, size, limiter)
   
   local _energy = 0
-  for i = offset, offset + size do
+  for i = offset, math.min(offset + size, self.length - 1) do
     _energy = _energy + (self.data:getSample(i) ^ 2)/ (limiter or size);
   end
   

@@ -28,7 +28,7 @@ end
 --    [sw] and [sh] are the width and height of the new Window
 --    [settings] (optional) are settings for love.window.setMode
 function simpleScale.updateWindow(sw, sh, settings)
-	love.window.setMode(sw, sh, settings)
+	if not webBuild then love.window.setMode(sw, sh, settings) end
 	windowW, windowH = love.graphics.getWidth(), love.graphics.getHeight()
 	wAspectRatio = windowW/windowH
 
@@ -140,4 +140,8 @@ function simpleScale.unSet(color)
 		love.graphics.rectangle("fill", windowW, 0, -math.abs((gameW*scale - (windowW))/2),windowH)
 	end
 	love.graphics.setColor(r,g,b,a)
+end
+
+function simpleScale.toGame(x, y)
+  return (x - xt) / simpleScale.scale, (y - yt) / simpleScale.scale
 end

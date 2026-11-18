@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:,"><title>upo</title>
+<style>
+  * { box-sizing:border-box }
+  body { margin:0; height:100vh; height:100dvh; background:#101014; color:white;
+    display:grid; place-items:center; overflow:hidden; font:1rem system-ui }
+  canvas { display:block; width:min(100vw,177.7778vh); width:min(100vw,177.7778dvh);
+    height:auto; aspect-ratio:16/9; touch-action:none; outline:none }
+  #status { position:absolute; background:#181820; color:white; padding:.8em 1.3em;
+    border:1px solid #888; border-radius:.3em; font:inherit }
+</style>
+<canvas id="canvas" width="960" height="540" tabindex="0" aria-label="upo"></canvas>
+<button id="status" disabled>Loading…</button>
+<script src="love.js"></script>
+<script>
+const canvas = document.getElementById("canvas");
+const statusButton = document.getElementById("status");
+canvas.oncontextmenu = event => event.preventDefault();
+async function prepare() {
+  const response = await fetch("game.love");
+  if (!response.ok) throw Error("Game download failed");
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  statusButton.textContent = "Play upo";
+  statusButton.disabled = false;
+  statusButton.onclick = async () => {
+    statusButton.hidden = true;
+    canvas.focus();
+    const module = {canvas, arguments:["./game.love","--web"], INITIAL_MEMORY:134217728,
+      preRun:[() => module.FS_createDataFile("/", "game.love", bytes, true, false, true)],
+      printErr:console.error.bind(console), onAbort:failed};
+    try { await Love(module); } catch (err) { failed(err); }
+  };
+}
+function failed(error) {
+  statusButton.hidden = false;
+  statusButton.disabled = true;
+  statusButton.textContent = "Unable to start. Reload to try again.";
+  console.error(error);
+}
+prepare().catch(failed);
+</script></html>

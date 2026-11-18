@@ -138,6 +138,7 @@ function maingame:loadLevel(index)
 end
 
 function maingame:die()
+  if isEndGame then return end
   isEndGame = true
   circle:clear()
   circle2:clear()

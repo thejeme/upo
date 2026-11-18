@@ -28,10 +28,11 @@ function button:update(dt)
 end
 
 function button:mousepressed(x, y, button)
-  if self.isMouseOnButton and (button == 1) then
+  local inside = x > self.x and x < self.x + self.width and y > self.y and y < self.y + self.height
+  if inside and (button == 1) then
     self.func()
     buttonhit:play()
-  elseif self.isMouseOnButton and button == 2 then
+  elseif inside and button == 2 then
     self.func2()
     buttonhit:play()
   end
