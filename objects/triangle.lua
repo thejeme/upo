@@ -14,7 +14,8 @@ function createTriangle(targetX, targetY, rotation, speed)
 end
 
 function triangle:update(dt)
-  for i, v in ipairs(listOfTriangles) do
+  for i = #listOfTriangles, 1, -1 do
+    local v = listOfTriangles[i]
     if (v.rotation == 1) then
       v.y = v.y - v.speed * dt
     elseif (v.rotation == 2) then

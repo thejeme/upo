@@ -48,7 +48,8 @@ function createLaser(speed)
 end
 
 function laser:update(dt)
-  for i, v in ipairs(listOfLasers) do
+  for i = #listOfLasers, 1, -1 do
+    local v = listOfLasers[i]
     if (v.direction == 1) then
       v.y = v.y + v.speed * dt
     elseif (v.direction == 2) then

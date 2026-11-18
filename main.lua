@@ -74,6 +74,13 @@ function love.update(dt)
   if discordRPC then discordRPC.runCallbacks() end
 end
 
+function love.focus(focused)
+  if not focused then
+    touchId = nil
+    if statemanager:getState() == "game" then maingame:pauseForInterruption() end
+  end
+end
+
 function love.draw()
 	simpleScale.set()
     statemanager:draw()

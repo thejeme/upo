@@ -11,7 +11,8 @@ function newCircleEffect(radius, speed)
 end
 
 function effectcircle:update(dt)    
-  for i, v in ipairs(listOfCircleEffects) do
+  for i = #listOfCircleEffects, 1, -1 do
+    local v = listOfCircleEffects[i]
   v.radius = v.radius + dt * v.speed
   v.lineWidth = v.lineWidth + dt * 2
     if (v.radius > 2000) then

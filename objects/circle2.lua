@@ -15,7 +15,8 @@ function createCircle2(targetX, targetY, radius, speed)
 end
 
 function circle2:update(dt)
-  for i, v in ipairs(listOfCircles2) do
+  for i = #listOfCircles2, 1, -1 do
+    local v = listOfCircles2[i]
     v.x = v.x + math.cos(v.rotation) * v.speed * dt
     v.y = v.y + math.sin(v.rotation) * v.speed * dt
     if (math.abs(v.x) > 2000 or math.abs(v.y) > 2000) then

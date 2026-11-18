@@ -32,7 +32,8 @@ function createLaser2(speed)
 end
 
 function laser2:update(dt)
-  for i, v in ipairs(listOfLasers2) do
+  for i = #listOfLasers2, 1, -1 do
+    local v = listOfLasers2[i]
     if (v.direction == 1) then
       if (v.phase == 1) then
         v.y = v.y + v.speed * dt

@@ -26,7 +26,8 @@ function createSquare(speed, triangleSpeed)
 end
 
 function square:update(dt)
-  for i, v in ipairs(listOfSquares) do
+  for i = #listOfSquares, 1, -1 do
+    local v = listOfSquares[i]
     v.timeTillExplode = v.timeTillExplode - v.speed * dt
     if (v.direction == 1) then
       v.y = v.y + v.speed * dt

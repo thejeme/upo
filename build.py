@@ -1,4 +1,4 @@
-"""Build the LÖVE archive and portable releases using Python 3.9+."""
+"""Build the LÃ–VE archive and portable releases using Python 3.9+."""
 import argparse
 import hashlib
 import io
@@ -81,10 +81,41 @@ cd "$work"
             archive.addfile(member, io.BytesIO(data))
 
 
+def web_runtime(engine):
+    source = engine.extractfile("package/src/compat/love.js").read()
+    # Flush saves when written. IndexedDB transactions during beforeunload may
+    # be interrupted, and a failed initial read should leave in-memory saves usable.
+    startup = b'if(err){Module["printErr"](err)}else{Module.removeRunDependency("IDBFS_sync")}'
+    replacement = b'if(err){Module["printErr"](err)}Module.removeRunDependency("IDBFS_sync")'
+    hook = b'window.addEventListener("beforeunload",function(event){FS.syncfs'
+    save_hook = rb"""
+var savesDirty = false, saveFlushPending = false;
+function flushSaves() {
+  if (!savesDirty || saveFlushPending) return;
+  savesDirty = false;
+  saveFlushPending = true;
+  FS.syncfs(false, function(error) {
+    saveFlushPending = false;
+    if (error) Module["printErr"](error);
+    flushSaves();
+  });
+}
+FS.trackingDelegate.onWriteToFile = function(path) {
+  if (/^\/home\/web_user\/love\/.*\/(settings|highscores)-v1\.dat$/.test(path)) {
+    savesDirty = true;
+    setTimeout(flushSaves, 0);
+  }
+};
+"""
+    if source.count(startup) != 1 or source.count(hook) != 1:
+        raise ValueError("Unexpected IndexedDB setup in the pinned love.js runtime")
+    return source.replace(startup, replacement).replace(hook, save_hook + hook)
+
+
 def web(output, game):
     with tarfile.open(runtime("web")) as engine, zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
-        for name in ("love.js", "love.wasm"):
-            archive.writestr(name, engine.extractfile("package/src/compat/" + name).read())
+        archive.writestr("love.js", web_runtime(engine))
+        archive.writestr("love.wasm", engine.extractfile("package/src/compat/love.wasm").read())
         archive.writestr("license.txt", engine.extractfile("package/LICENSE").read())
         archive.write(ROOT / "web" / "index.html", "index.html")
         archive.write(game, "game.love")

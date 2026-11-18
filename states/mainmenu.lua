@@ -11,10 +11,10 @@ mainmenu = {}
 function mainmenu:load()
   menustate = "main"
 
-  buttonhover = audio:newSource("assets/buttonhover.wav", "stream")
+  buttonhover = love.audio.newSource("assets/buttonhover.wav", "static")
   buttonhover:setVolume(volumeValue * 0.001)
 
-  buttonhit = audio:newSource("assets/buttonhit2.wav", "stream")
+  buttonhit = love.audio.newSource("assets/buttonhit2.wav", "static")
   buttonhit:setVolume(volumeValue * 0.001)
 
   menumusic = audio:newSource("songs/Hinkik - Ena.mp3", "stream")

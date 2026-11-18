@@ -13,7 +13,8 @@ function createKite(targetX, targetY, speed)
 end
 
 function kite:update(dt)
-  for i, v in ipairs(listOfKites) do
+  for i = #listOfKites, 1, -1 do
+    local v = listOfKites[i]
     v.x = v.x + v.speed * dt
     if (v.x < -800) then
       table.remove(listOfKites, i)

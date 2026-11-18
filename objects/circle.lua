@@ -19,7 +19,8 @@ function createCircle(radius, speed, rotation, direction)
 end
 
 function circle:update(dt)
-  for i, v in ipairs(listOfCircles) do
+  for i = #listOfCircles, 1, -1 do
+    local v = listOfCircles[i]
     v.x = v.x + v.speed * dt
     if (v.x < -500 or v.x > 1000) then
       table.remove(listOfCircles, i)

@@ -1,39 +1,55 @@
-serialize = require 'lib/ser'
+local savemanager = {}
+local levelCount = 6
+local settingsFile = "settings-v1.dat"
+local scoresFile = "highscores-v1.dat"
 
-savemanager = {}
+local function readNumbers(filename, limits)
+  local info = love.filesystem.getInfo(filename, "file")
+  if not info or info.size > 512 then return nil end
+
+  local ok, data = pcall(love.filesystem.read, filename)
+  if not ok or not data or #data > 512 then return nil end
+
+  local values = {}
+  for token in data:gmatch("%S+") do
+    local limit = limits[#values + 1]
+    local value = tonumber(token)
+    if not limit or not value or value ~= value or value == math.huge or value < 0 or value > limit then
+      return nil
+    end
+    values[#values + 1] = value
+  end
+  if #values == #limits then return values end
+end
+
+local function write(filename, values)
+  local ok, written, err = pcall(love.filesystem.write, filename, table.concat(values, "\n") .. "\n")
+  if not ok or not written then
+    print("Could not save " .. filename .. ": " .. tostring(ok and err or written))
+    return false
+  end
+  return true
+end
 
 function savemanager:load()
-  if not love.filesystem.getInfo("settings.txt") then
-    settings = {}
-    settings.windowWidth = 0
-    settings.volume = 100
+  local settings = readNumbers(settingsFile, {16384, 200}) or {0, 100}
+  self.settings = {windowWidth = math.floor(settings[1]), volume = settings[2]}
 
-    love.filesystem.write("settings.txt", serialize(settings))
+  local defaults, limits = {}, {}
+  for i = 1, levelCount do
+    defaults[i], limits[i] = 0, math.huge
   end
-
-  chunk = love.filesystem.load("settings.txt")
-  savemanager.settings = chunk()
-
-  if not love.filesystem.getInfo("highscores.txt") then
-    highscores = {}
-    highscores.levelScore = {0, 0, 0, 0, 0, 0}
-    love.filesystem.write("highscores.txt", serialize(highscores))
-  end
-
-  chunk = love.filesystem.load("highscores.txt")
-  savemanager.highscores = chunk()
+  self.highscores = {levelScore = readNumbers(scoresFile, limits) or defaults}
 end
 
 function savemanager:saveHighscores()
-  love.filesystem.write("highscores.txt", serialize(savemanager.highscores))
+  return write(scoresFile, self.highscores.levelScore)
 end
 
 function savemanager:saveSettings(windowWidth, volume)
-  settings = {}
-  settings.windowWidth = windowWidth
-  settings.volume = volume
-
-  love.filesystem.write("settings.txt", serialize(settings))
+  self.settings = {windowWidth = windowWidth, volume = volume}
+  return write(settingsFile, {windowWidth, volume})
 end
 
+_G.savemanager = savemanager
 return savemanager
