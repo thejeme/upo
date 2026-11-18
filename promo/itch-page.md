@@ -2,11 +2,15 @@
 
 ## Short description
 
-Dodge moving shapes in a circular arena across six electronic tracks.
+Steer a tiny cursor through six electronic tracks. Every second you dodge is a second on the clock.
 
 ## About
 
-Guide your cursor through six electronic tracks. Each arena asks you to dodge a different pattern of circles, lasers and shapes. Beat your best survival time on each track. Play in your browser, or download the Windows or Linux version.
+In upo, your cursor is the player. Slip between moving shapes, steer around lasers and see how long you can stay alive inside the circle. One collision stops the clock.
+
+Each of the six tracks changes how you read the arena. In *Time Leaper*, you can only move along the rim as circles fly out from the centre. In *Supernova*, a small pool of light follows your cursor, and you only see hazards when they enter it. Each track keeps its own best time.
+
+Play in your browser or download the game for Windows or Linux.
 
 ## Controls
 
