@@ -28,6 +28,7 @@ local level3BG = love.graphics.newImage("assets/level03.png")
 
 local levelIndex
 local timer
+local newPersonalBest
 local paused
 local lastX, lastY
 local continueButton
@@ -224,8 +225,10 @@ function maingame:die()
   gamemusic:stop()
   failsound:play()
 
-  if (timer > savemanager.highscores.levelScore[levelIndex]) then
-    savemanager.highscores.levelScore[levelIndex] = tonumber(string.format("%0.1f", timer))
+  local score = tonumber(string.format("%0.1f", timer))
+  newPersonalBest = score > savemanager.highscores.levelScore[levelIndex]
+  if newPersonalBest then
+    savemanager.highscores.levelScore[levelIndex] = score
     savemanager:saveHighscores()
   end
 end
@@ -251,7 +254,7 @@ function maingame:endScreen()
 
   love.graphics.setFont(levelScoreFont)
   love.graphics.setColor(White)
-  if (timer > savemanager.highscores.levelScore[levelIndex]) then
+  if newPersonalBest then
     if (levelIndex == 4) then
       love.graphics.printf("NEW PERSONAL BEST", 0, gh*0.37, gw, "center")
     else
@@ -262,6 +265,7 @@ end
 
 function maingame:restart()
   timer = 0
+  newPersonalBest = false
   isEndGame = false
   paused = false
   lastX, lastY = nil, nil

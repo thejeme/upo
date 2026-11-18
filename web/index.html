@@ -8,38 +8,38 @@
     display:grid; place-items:center; overflow:hidden; font:1rem system-ui }
   canvas { display:block; width:min(100vw,177.7778vh); width:min(100vw,177.7778dvh);
     height:auto; aspect-ratio:16/9; touch-action:none; outline:none }
-  #status { position:absolute; background:#181820; color:white; padding:.8em 1.3em;
-    border:1px solid #888; border-radius:.3em; font:inherit }
+  #status { position:absolute; margin:0; padding:.8em 1.3em }
 </style>
 <canvas id="canvas" width="960" height="540" tabindex="0" aria-label="upo"></canvas>
-<button id="status" disabled>Loading…</button>
+<p id="status" role="status">Loading…</p>
 <script src="love.js"></script>
 <script>
 const canvas = document.getElementById("canvas");
-const statusButton = document.getElementById("status");
+const status = document.getElementById("status");
 canvas.oncontextmenu = event => event.preventDefault();
 async function prepare() {
   const response = await fetch("game.love");
   if (!response.ok) throw Error("Game download failed");
   const bytes = new Uint8Array(await response.arrayBuffer());
-  statusButton.textContent = "Play upo";
-  statusButton.disabled = false;
-  statusButton.onclick = async () => {
-    statusButton.hidden = true;
+  // Use the longer edge so rotating a phone keeps the original artwork sharp.
+  const pixels = Math.max(innerWidth, innerHeight) * (window.devicePixelRatio || 1);
+  const units = Math.min(120, Math.max(40, Math.ceil(pixels / 16)));
+  let failedToStart = false;
+  const module = {canvas, arguments:["./game.love","--web","--canvas-units=" + units], INITIAL_MEMORY:134217728,
+    preRun:[() => module.FS_createDataFile("/", "game.love", bytes, true, false, true)],
+    printErr:console.error.bind(console), onAbort:error => {
+      failedToStart = true;
+      failed(error);
+    }};
+  await Love(module);
+  if (!failedToStart) {
+    status.hidden = true;
     canvas.focus();
-    // Use the longer edge so rotating a phone keeps the original artwork sharp.
-    const pixels = Math.max(innerWidth, innerHeight) * (window.devicePixelRatio || 1);
-    const units = Math.min(120, Math.max(40, Math.ceil(pixels / 16)));
-    const module = {canvas, arguments:["./game.love","--web","--canvas-units=" + units], INITIAL_MEMORY:134217728,
-      preRun:[() => module.FS_createDataFile("/", "game.love", bytes, true, false, true)],
-      printErr:console.error.bind(console), onAbort:failed};
-    try { await Love(module); } catch (err) { failed(err); }
-  };
+  }
 }
 function failed(error) {
-  statusButton.hidden = false;
-  statusButton.disabled = true;
-  statusButton.textContent = "Unable to start. Reload to try again.";
+  status.hidden = false;
+  status.textContent = "Unable to start. Reload to try again.";
   console.error(error);
 }
 prepare().catch(failed);
